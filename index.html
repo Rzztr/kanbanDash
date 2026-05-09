@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanban Dashboard - Proyectos</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/apple-icon-180.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="shortcut icon" href="icon.png" type="image/x-icon">
+
+    <meta name="theme-color" content="#0078d4">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+    <header class="header">
+        <h1>Tablero de Tareas</h1>
+        <button class="add-task-btn" onclick="openNewTaskModal()">+ Nueva Tarea</button>
+    </header>
+
+    <!-- Modal para nueva tarea -->
+    <div id="task-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeNewTaskModal()">&times;</span>
+            <h2>Nueva Tarea</h2>
+            <input type="text" id="new-task-title" placeholder="Título de la tarea">
+            <textarea id="new-task-desc" placeholder="Descripción"></textarea>
+            <select id="new-task-priority">
+                <option value="high">Alta</option>
+                <option value="medium">Media</option>
+                <option value="low">Baja</option>
+            </select>
+            <button onclick="createNewTask()" class="btn-primary">Crear Tarea</button>
+        </div>
+    </div>
+
+    <main class="kanban-board">
+        <!-- Planeado -->
+        <div class="column" id="planeado" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <h2 class="column-title">Planeado</h2>
+            <div class="tasks-container">
+                <!-- Las tareas se cargarán aquí desde Supabase -->
+            </div>
+        </div>
+
+        <!-- En Proceso -->
+        <div class="column" id="proceso" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <h2 class="column-title">En Proceso</h2>
+            <div class="tasks-container"></div>
+        </div>
+
+        <!-- Realizado -->
+        <div class="column" id="realizado" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <h2 class="column-title">Realizado</h2>
+            <div class="tasks-container"></div>
+        </div>
+
+        <!-- Reportado -->
+        <div class="column" id="reportado" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <h2 class="column-title">Reportado</h2>
+            <div class="tasks-container"></div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker registrado con éxito:', reg.scope))
+                    .catch(err => console.error('Error al registrar Service Worker:', err));
+            });
+        }
+    </script>
+</body>
+
+</html>
