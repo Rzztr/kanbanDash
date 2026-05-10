@@ -39,7 +39,10 @@
     <div id="app-container" style="display: none;">
         <header class="header">
         <h1>Tablero de Tareas</h1>
-        <button class="add-task-btn" onclick="openNewTaskModal()">+ Nueva Tarea</button>
+        <div class="header-actions">
+            <button class="add-task-btn" onclick="openNewTaskModal()">+ Nueva Tarea</button>
+            <button class="logout-btn" onclick="handleLogout()">Cerrar Sesión</button>
+        </div>
     </header>
 
     <!-- Modal para nueva tarea -->

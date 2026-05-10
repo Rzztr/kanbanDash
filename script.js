@@ -29,6 +29,13 @@ function showApp() {
     fetchTasks();
 }
 
+function handleLogout() {
+    sessionStorage.removeItem('kanban_user');
+    currentUser = null;
+    document.getElementById('login-password').value = '';
+    showLogin();
+}
+
 // --- AUTHENTICATION ---
 async function hashPassword(password) {
     const msgBuffer = new TextEncoder().encode(password);
@@ -40,25 +47,25 @@ async function hashPassword(password) {
 async function handleLogin(event) {
     event.preventDefault();
 
+    // Aplicamos .trim() para limpiar espacios accidentales
     const usernameInput = document.getElementById('login-username').value.trim();
-    const passwordInput = document.getElementById('login-password').value;
+    const passwordInput = document.getElementById('login-password').value.trim();
     const errorDiv = document.getElementById('login-error');
 
     errorDiv.style.display = 'none';
 
     try {
+        // El navegador cifrará "R$tr" correctamente como 0058e5...
         const hashedPassword = await hashPassword(passwordInput);
 
-        // Intento de autenticación manual contra la tabla 'users'
         const { data: users, error } = await supabaseClient
             .from('users')
-            .select('id, username, full_name') // No traigas el hash de vuelta
+            .select('id, username, full_name')
             .eq('username', usernameInput)
             .eq('password_hash', hashedPassword)
-            .single(); // .single() devuelve un objeto si encuentra uno, o error si no
+            .single();
 
         if (error) {
-            // Si el error es PGRST116, significa que no encontró el usuario
             if (error.code === 'PGRST116') {
                 errorDiv.textContent = 'Usuario o contraseña incorrectos.';
             } else {
@@ -69,15 +76,13 @@ async function handleLogin(event) {
         }
 
         if (users) {
-            // Guardar sesión y redirigir
             sessionStorage.setItem('kanban_user', JSON.stringify(users));
-            // Asegúrate de que showApp() esté definida para cambiar la vista
             showApp();
         }
 
     } catch (err) {
         console.error('Error detallado:', err);
-        errorDiv.textContent = 'Error de conexión o permisos de base de datos.';
+        errorDiv.textContent = `Error: ${err.message || 'Error de conexión.'}`;
         errorDiv.style.display = 'block';
     }
 }
