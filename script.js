@@ -4,7 +4,73 @@ const SUPABASE_ANON_KEY = 'sb_publishable_xMvwrUSzwdIEnDM-6QT0aQ_M28enOlj';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // --- INICIALIZACIÓN ---
-document.addEventListener('DOMContentLoaded', fetchTasks);
+let currentUser = null;
+
+document.addEventListener('DOMContentLoaded', checkLoginStatus);
+
+function checkLoginStatus() {
+    const loggedIn = sessionStorage.getItem('kanban_user');
+    if (loggedIn) {
+        currentUser = JSON.parse(loggedIn);
+        showApp();
+    } else {
+        showLogin();
+    }
+}
+
+function showLogin() {
+    document.getElementById('login-container').style.display = 'flex';
+    document.getElementById('app-container').style.display = 'none';
+}
+
+function showApp() {
+    document.getElementById('login-container').style.display = 'none';
+    document.getElementById('app-container').style.display = 'block';
+    fetchTasks();
+}
+
+// --- AUTHENTICATION ---
+async function hashPassword(password) {
+    const msgBuffer = new TextEncoder().encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+}
+
+async function handleLogin(event) {
+    event.preventDefault();
+    const usernameInput = document.getElementById('login-username').value;
+    const passwordInput = document.getElementById('login-password').value;
+    const errorDiv = document.getElementById('login-error');
+
+    errorDiv.style.display = 'none';
+
+    try {
+        const hashedPassword = await hashPassword(passwordInput);
+
+        const { data: users, error } = await supabaseClient
+            .from('users')
+            .select('*')
+            .eq('username', usernameInput)
+            .eq('password_hash', hashedPassword);
+
+        if (error) throw error;
+
+        if (users && users.length > 0) {
+            currentUser = users[0];
+            sessionStorage.setItem('kanban_user', JSON.stringify(currentUser));
+            showApp();
+        } else {
+            errorDiv.style.display = 'block';
+            errorDiv.textContent = 'Usuario o contraseña incorrectos.';
+        }
+    } catch (err) {
+        console.error('Error in login:', err);
+        errorDiv.textContent = 'Error al conectar con la base de datos.';
+        errorDiv.style.display = 'block';
+    }
+}
 
 const priorityLabels = {
     'high': 'Alta',
