@@ -87,6 +87,75 @@ async function handleLogin(event) {
     }
 }
 
+// --- TABS & LOGS ---
+function switchTab(tab) {
+    const boardTab = document.getElementById('tab-board');
+    const logsTab = document.getElementById('tab-logs');
+    const kanbanBoard = document.querySelector('.kanban-board');
+    const logsView = document.getElementById('logs-view');
+    const addTaskBtn = document.querySelector('.add-task-btn');
+
+    if (tab === 'board') {
+        boardTab.classList.add('active');
+        logsTab.classList.remove('active');
+        kanbanBoard.style.display = 'flex';
+        logsView.style.display = 'none';
+        addTaskBtn.style.display = 'inline-block';
+    } else {
+        boardTab.classList.remove('active');
+        logsTab.classList.add('active');
+        kanbanBoard.style.display = 'none';
+        logsView.style.display = 'block';
+        addTaskBtn.style.display = 'none';
+        fetchLogs();
+    }
+}
+
+async function logActivity(action, taskTitle, details) {
+    const user = currentUser ? (currentUser.full_name || currentUser.username) : 'Sistema';
+    const { error } = await supabaseClient
+        .from('activity_logs')
+        .insert([{
+            username: user,
+            action: action,
+            task_title: taskTitle,
+            details: details
+        }]);
+    
+    if (error) console.error('Error guardando log:', error);
+}
+
+async function fetchLogs() {
+    const { data: logs, error } = await supabaseClient
+        .from('activity_logs')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+    if (error) {
+        console.error('Error fetching logs:', error);
+        return;
+    }
+
+    const tbody = document.getElementById('logs-table-body');
+    tbody.innerHTML = '';
+
+    logs.forEach(log => {
+        const tr = document.createElement('tr');
+        const date = new Date(log.created_at).toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
+        const actionClass = log.action.toLowerCase();
+        
+        tr.innerHTML = `
+            <td>${date}</td>
+            <td>${log.username}</td>
+            <td><span class="log-action ${actionClass}">${log.action}</span></td>
+            <td>${log.task_title || '-'}</td>
+            <td>${log.details || '-'}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
 const priorityLabels = {
     'high': 'Alta',
     'medium': 'Media',
@@ -173,6 +242,10 @@ async function drop(ev) {
 
         if (error) {
             console.error('Error updating status:', error);
+        } else {
+            const taskTitle = draggedElement.querySelector('h3').textContent;
+            const columnTitle = target.querySelector('.column-title').textContent;
+            logActivity('MOVIDO', taskTitle, `Movió la tarea a '${columnTitle}'`);
         }
     }
 }
@@ -211,6 +284,7 @@ async function createNewTask() {
 
     if (data && data.length > 0) {
         renderTask(data[0]);
+        logActivity('CREADO', title, 'Nueva tarea planeada');
     }
 
     // Limpiar y cerrar modal
@@ -249,6 +323,9 @@ async function assignTask(taskId) {
         if (assigneeSpan) {
             assigneeSpan.textContent = "Asignado a: " + newAssignee.trim();
         }
+        
+        const taskTitle = taskElement.querySelector('h3').textContent;
+        logActivity('ASIGNADO', taskTitle, `Asignada a ${newAssignee.trim()}`);
     }
 }
 
@@ -269,6 +346,8 @@ async function deleteTask(taskId) {
 
     const taskElement = document.getElementById(taskId);
     if (taskElement) {
+        const taskTitle = taskElement.querySelector('h3').textContent;
+        logActivity('ELIMINADO', taskTitle, 'Tarea eliminada');
         taskElement.remove();
     }
 }

@@ -38,7 +38,13 @@
     <!-- Contenedor de la Aplicación (Oculto por defecto) -->
     <div id="app-container" style="display: none;">
         <header class="header">
-        <h1>Tablero de Tareas</h1>
+        <div class="header-left">
+            <h1>Tablero de Tareas</h1>
+            <nav class="tabs-nav">
+                <button id="tab-board" class="tab-btn active" onclick="switchTab('board')">Tablero</button>
+                <button id="tab-logs" class="tab-btn" onclick="switchTab('logs')">Historial</button>
+            </nav>
+        </div>
         <div class="header-actions">
             <button class="add-task-btn" onclick="openNewTaskModal()">+ Nueva Tarea</button>
             <button class="logout-btn" onclick="handleLogout()">Cerrar Sesión</button>
@@ -86,6 +92,30 @@
         <div class="column" id="reportado" ondrop="drop(event)" ondragover="allowDrop(event)">
             <h2 class="column-title">Reportado</h2>
             <div class="tasks-container"></div>
+        </div>
+    </main>
+
+    <!-- Historial / Logs -->
+    <main id="logs-view" class="logs-container" style="display: none;">
+        <div class="logs-header">
+            <h2>Registro de Actividad</h2>
+            <button onclick="fetchLogs()" class="refresh-btn">↻ Actualizar</button>
+        </div>
+        <div class="table-responsive">
+            <table class="logs-table">
+                <thead>
+                    <tr>
+                        <th>Fecha y Hora</th>
+                        <th>Usuario</th>
+                        <th>Acción</th>
+                        <th>Tarea</th>
+                        <th>Detalles</th>
+                    </tr>
+                </thead>
+                <tbody id="logs-table-body">
+                    <!-- Los logs se cargarán aquí -->
+                </tbody>
+            </table>
         </div>
     </main>
     </div>
