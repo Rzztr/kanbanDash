@@ -551,3 +551,73 @@ body {
 .log-action.movido { background-color: rgba(59, 140, 232, 0.2); color: #93c5fd; }
 .log-action.asignado { background-color: rgba(245, 158, 11, 0.2); color: #fcd34d; }
 .log-action.eliminado { background-color: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+
+/* --- RESPONSIVE DESIGN --- */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        padding: 1rem;
+        gap: 16px;
+    }
+    
+    .header-left {
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+        text-align: center;
+    }
+    
+    .header h1 {
+        font-size: 1.3rem;
+    }
+    
+    .tabs-nav {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .header-actions {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .add-task-btn, .logout-btn {
+        flex: 1;
+        text-align: center;
+        padding: 10px;
+    }
+    
+    .kanban-board {
+        padding: 16px;
+        scroll-snap-type: x mandatory;
+        scroll-padding: 16px;
+        padding-bottom: 24px;
+    }
+    
+    .column {
+        min-width: 85vw;
+        scroll-snap-align: center;
+        flex: 0 0 auto;
+    }
+    
+    .logs-container {
+        padding: 16px;
+    }
+    
+    .logs-header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: stretch;
+        text-align: center;
+    }
+    
+    .refresh-btn {
+        width: 100%;
+    }
+    
+    .login-card {
+        padding: 24px;
+        margin: 16px;
+        width: auto;
+    }
+}
