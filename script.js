@@ -34,13 +34,13 @@ async function hashPassword(password) {
     const msgBuffer = new TextEncoder().encode(password);
     const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    return hashHex;
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 async function handleLogin(event) {
     event.preventDefault();
-    const usernameInput = document.getElementById('login-username').value;
+
+    const usernameInput = document.getElementById('login-username').value.trim();
     const passwordInput = document.getElementById('login-password').value;
     const errorDiv = document.getElementById('login-error');
 
@@ -49,25 +49,35 @@ async function handleLogin(event) {
     try {
         const hashedPassword = await hashPassword(passwordInput);
 
+        // Intento de autenticación manual contra la tabla 'users'
         const { data: users, error } = await supabaseClient
             .from('users')
-            .select('*')
+            .select('id, username, full_name') // No traigas el hash de vuelta
             .eq('username', usernameInput)
-            .eq('password_hash', hashedPassword);
+            .eq('password_hash', hashedPassword)
+            .single(); // .single() devuelve un objeto si encuentra uno, o error si no
 
-        if (error) throw error;
-
-        if (users && users.length > 0) {
-            currentUser = users[0];
-            sessionStorage.setItem('kanban_user', JSON.stringify(currentUser));
-            showApp();
-        } else {
+        if (error) {
+            // Si el error es PGRST116, significa que no encontró el usuario
+            if (error.code === 'PGRST116') {
+                errorDiv.textContent = 'Usuario o contraseña incorrectos.';
+            } else {
+                throw error;
+            }
             errorDiv.style.display = 'block';
-            errorDiv.textContent = 'Usuario o contraseña incorrectos.';
+            return;
         }
+
+        if (users) {
+            // Guardar sesión y redirigir
+            sessionStorage.setItem('kanban_user', JSON.stringify(users));
+            // Asegúrate de que showApp() esté definida para cambiar la vista
+            showApp();
+        }
+
     } catch (err) {
-        console.error('Error in login:', err);
-        errorDiv.textContent = 'Error al conectar con la base de datos.';
+        console.error('Error detallado:', err);
+        errorDiv.textContent = 'Error de conexión o permisos de base de datos.';
         errorDiv.style.display = 'block';
     }
 }
