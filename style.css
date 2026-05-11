@@ -359,6 +359,15 @@ body {
     background: radial-gradient(circle at top right, #1e293b, var(--bg-color));
 }
 
+.login-logo {
+    height: 60px;
+    /* Un poco más grande que en el header para que destaque */
+    width: auto;
+    margin-bottom: 1rem;
+    /* Espacio entre el logo y el título "Iniciar Sesión" */
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
 .login-card {
     background: rgba(30, 33, 40, 0.7);
     backdrop-filter: blur(12px);
@@ -439,7 +448,7 @@ body {
 .tabs-nav {
     display: flex;
     gap: 8px;
-    background-color: rgba(0,0,0,0.2);
+    background-color: rgba(0, 0, 0, 0.2);
     padding: 4px;
     border-radius: 8px;
 }
@@ -463,7 +472,7 @@ body {
 .tab-btn.active {
     background-color: var(--card-bg);
     color: var(--text-main);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* --- Logs View --- */
@@ -547,10 +556,26 @@ body {
     font-weight: 600;
     background-color: rgba(255, 255, 255, 0.1);
 }
-.log-action.creado { background-color: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
-.log-action.movido { background-color: rgba(59, 140, 232, 0.2); color: #93c5fd; }
-.log-action.asignado { background-color: rgba(245, 158, 11, 0.2); color: #fcd34d; }
-.log-action.eliminado { background-color: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+
+.log-action.creado {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: #6ee7b7;
+}
+
+.log-action.movido {
+    background-color: rgba(59, 140, 232, 0.2);
+    color: #93c5fd;
+}
+
+.log-action.asignado {
+    background-color: rgba(245, 158, 11, 0.2);
+    color: #fcd34d;
+}
+
+.log-action.eliminado {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+}
 
 /* --- RESPONSIVE DESIGN --- */
 @media (max-width: 768px) {
@@ -559,65 +584,83 @@ body {
         padding: 1rem;
         gap: 16px;
     }
-    
+
     .header-left {
         flex-direction: column;
         gap: 12px;
         width: 100%;
         text-align: center;
     }
-    
+
     .header h1 {
         font-size: 1.3rem;
     }
-    
+
     .tabs-nav {
         width: 100%;
         justify-content: center;
     }
-    
+
     .header-actions {
         width: 100%;
         justify-content: center;
     }
-    
-    .add-task-btn, .logout-btn {
+
+    .add-task-btn,
+    .logout-btn {
         flex: 1;
         text-align: center;
         padding: 10px;
     }
-    
+
     .kanban-board {
         padding: 16px;
         scroll-snap-type: x mandatory;
         scroll-padding: 16px;
         padding-bottom: 24px;
     }
-    
+
     .column {
         min-width: 85vw;
         scroll-snap-align: center;
         flex: 0 0 auto;
     }
-    
+
     .logs-container {
         padding: 16px;
     }
-    
+
     .logs-header {
         flex-direction: column;
         gap: 16px;
         align-items: stretch;
         text-align: center;
     }
-    
+
     .refresh-btn {
         width: 100%;
     }
-    
+
     .login-card {
         padding: 24px;
         margin: 16px;
         width: auto;
     }
+}
+
+.header-logo {
+    height: 32px;
+    /* Tamaño pequeño y constante */
+    width: auto;
+    /* Mantiene la proporción */
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    /* Opcional: le da un poco de profundidad */
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    /* Espacio reducido entre el logo y el texto */
 }
